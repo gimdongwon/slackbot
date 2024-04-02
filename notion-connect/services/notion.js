@@ -9,17 +9,35 @@ const notion = new Client({
 })
 const database_id = process.env.NOTION_DATABASE_ID
 
-module.exports = async function getCalendarList() {
-    const {results} = await notion.databases.query({
+module.exports.getCalendarList = async function getCalendarList() {
+    const { results } = await notion.databases.query({
         database_id: database_id
 	})
 	const calendar = results.map((page) => {
 		return {
-			id: page.id,
-			title: page.properties.Name.title[0].text.content,
-			gender: page.properties.Gender.multi_select[0].name,
-			age: page.properties.Age.number,
+			id: page?.id,
+			title: page?.properties?.Name?.title[0]?.text?.content,
+			gender: page?.properties?.Gender?.multi_select[0]?.name,
+			age: page?.properties?.Age?.number,
 		}
 	});
 	return calendar
+}
+
+module.exports.postCalendar = async function postCalendar() {
+	// await notion.databases.create({
+	// 	parent: { database_id },
+	// 	properties: {
+	// 		title: {
+	// 			title: [
+	// 				{
+	// 					"text": {
+	// 						"content": "test"
+	// 					}
+	// 				}
+	// 			]
+	// 		}
+	// 	}
+	// })
+	return "success"
 }
