@@ -1,5 +1,6 @@
 const express = require("express");
 const { getCalendarList, postCalendar } = require("./services/notion");
+const { sendSlackMessage } = require("./services/slack");
 const PORT = process.env.PORT || 5001;
 
 const app = express();
@@ -17,6 +18,11 @@ app.get("/calendars", async (req, res) => {
 
 app.post("/calendar", async (req, res) => {
   const result = await postCalendar(req.body);
+  res.json(result);
+});
+
+app.post("/sendSlackMessage", async (req, res) => {
+  const result = await sendSlackMessage();
   res.json(result);
 });
 

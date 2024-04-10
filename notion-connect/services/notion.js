@@ -9,6 +9,16 @@ const notion = new Client({
 });
 const database_id = process.env.NOTION_DATABASE_ID;
 
+Date.prototype.toYYYYMMDD = function () {
+  const date = new Date(this.valueOf());
+  let YYYY = date.getFullYear();
+  let MM = date.getMonth() + 1;
+  let DD = date.getDate();
+  let _MM = MM >= 10 ? `${MM}` : `0${MM}`;
+  let _DD = DD >= 10 ? `${DD}` : `0${DD}`;
+  return `${YYYY}-${_MM}-${_DD}`;
+};
+
 module.exports.getCalendarList = async function getCalendarList() {
   const { results } = await notion.databases.query({
     database_id,
@@ -25,6 +35,7 @@ module.exports.getCalendarList = async function getCalendarList() {
 };
 
 module.exports.postCalendar = async function postCalendar(req) {
+  const today = new Date().toYYYYMMDD();
   try {
     const properties = {
       title: {
@@ -53,9 +64,12 @@ module.exports.postCalendar = async function postCalendar(req) {
     const result = await notion.pages.create({
       parent: { database_id },
       properties,
+      created_time: {
+        on_or_after: today,
+      },
     });
     console.log("Success! Entry added.");
-    return result;
+    return res.status(200).json(result);
   } catch (error) {
     console.error(error, "error");
   }
