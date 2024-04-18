@@ -1,6 +1,0 @@
-{
-  "devDependencies": {
-    "@slack/events-api": "^3.0.1",
-    "@slack/webhook": "^7.0.2"
-  }
-}

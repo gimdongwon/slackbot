@@ -18,8 +18,16 @@ module.exports.sendSlackMessage = async () => {
     });
 
     // `res` contains information about the posted message
-    console.log("Message sent: ", res.ts);
-    return res;
+    console.log("Message sent: ", res.message.text);
+    return res.message.text;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+module.exports.getRecommendFoods = async () => {
+  try {
+    return { food: "햄버거" };
   } catch (error) {
     console.error(error);
   }

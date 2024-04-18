@@ -1,6 +1,6 @@
 const express = require("express");
 const { getCalendarList, postCalendar } = require("./services/notion");
-const { sendSlackMessage } = require("./services/slack");
+const { sendSlackMessage, getRecommendFoods } = require("./services/slack");
 const PORT = process.env.PORT || 5001;
 
 const app = express();
@@ -23,6 +23,11 @@ app.post("/calendar", async (req, res) => {
 
 app.post("/sendSlackMessage", async (req, res) => {
   const result = await sendSlackMessage();
+  res.json(result);
+});
+
+app.get("/getRecommendFood", async (req, res) => {
+  const result = await getRecommendFoods();
   res.json(result);
 });
 
