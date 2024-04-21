@@ -19,24 +19,41 @@ Date.prototype.toYYYYMMDD = function () {
   return `${YYYY}-${_MM}-${_DD}`;
 };
 
-module.exports.getCalendarList = async function getCalendarList() {
+module.exports.getMenuList = async function getMenuList() {
   const { results } = await notion.databases.query({
     database_id,
   });
-  const calendar = results.map((page) => {
+  const MenuList = results.map((page) => {
     return {
       id: page?.id,
-      title: page?.properties?.Name?.title[0]?.text?.content,
-      gender: page?.properties?.Gender?.multi_select?.[0]?.name,
-      age: page?.properties?.Age?.number,
+      title: page.properties.Title.title[0].plain_text,
+      type: page.properties.Type.rich_text[0].plain_text,
+      recommendTime: page.properties.RecommendTime.rich_text[0].plain_text,
+      michelin: page.properties.Michelin.rich_text[0].plain_text,
+      mainMenu: page.properties.MainMenu.rich_text[0].plain_text,
+      address: page.properties.Address.rich_text[0].plain_text,
+      link: page.properties.Link.rich_text[0].plain_text,
+      comment: page.properties.Comment.rich_text[0].plain_text,
     };
   });
-  return calendar;
+  return MenuList;
 };
 
-module.exports.postCalendar = async function postCalendar(req) {
+module.exports.postMenu = async function postMenu(req) {
   const today = new Date().toYYYYMMDD();
   try {
+    const handlePropertiesObj = (target) => {
+      return {
+        rich_text: [
+          {
+            type: "text",
+            text: {
+              content: target,
+            },
+          },
+        ],
+      };
+    };
     const properties = {
       title: {
         title: [
@@ -48,18 +65,13 @@ module.exports.postCalendar = async function postCalendar(req) {
           },
         ],
       },
-      Gender: {
-        rich_text: [
-          {
-            text: {
-              content: req.gender,
-            },
-          },
-        ],
-      },
-      Age: {
-        number: req.age,
-      },
+      Type: handlePropertiesObj(req.type),
+      RecommendTime: handlePropertiesObj(req.RecommendTime),
+      Michelin: handlePropertiesObj(req.Michelin),
+      MainMenu: handlePropertiesObj(req.MainMenu),
+      Address: handlePropertiesObj(req.Address),
+      Link: handlePropertiesObj(req.Link),
+      Comment: handlePropertiesObj(req.Comment),
     };
     const result = await notion.pages.create({
       parent: { database_id },
@@ -68,8 +80,7 @@ module.exports.postCalendar = async function postCalendar(req) {
         on_or_after: today,
       },
     });
-    console.log("Success! Entry added.");
-    return res.status(200).json(result);
+    return result;
   } catch (error) {
     console.error(error, "error");
   }
